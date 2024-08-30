@@ -1,4 +1,3 @@
- 
 pipeline {
     agent any
 
@@ -10,7 +9,7 @@ pipeline {
         }
         stage('Unit and Integration Tests') {
             steps {
-                echo 'Running unit and integration tests...'                
+                echo 'Running unit and integration tests...'
             }
         }
         stage('Code Analysis') {
@@ -43,13 +42,18 @@ pipeline {
     post {
         always {
             echo 'Sending notification email...'
-            // Sending email notification with stage status and logs as attachment
+            // Sending email notification with build status
             script {
-                emailext (
+                emailext(
                     to: 'anjanam9339@gmail.com',
                     subject: "Pipeline Status: ${currentBuild.currentResult}",
-                    body: "The pipeline has finished with status: ${currentBuild.currentResult}. Please find the attached logs.",
-                    attachmentsPattern: '**/*.log'
+                    body: """
+                    The pipeline ${env.JOB_NAME} build #${env.BUILD_NUMBER} has completed with status: ${currentBuild.currentResult}.
+                    
+                    - Job URL: ${env.BUILD_URL}
+                    - Build Log: ${env.BUILD_URL}console
+                    """,
+                    attachLog: true // Optionally, attach the console log if needed
                 )
             }
         }
